@@ -6,9 +6,11 @@ import {
   CreateDateColumn,
   BeforeInsert,
   BeforeUpdate,
+  OneToMany,
 } from 'typeorm';
 
 import * as bcryptjs from 'bcryptjs';
+import { Posts } from '../posts/posts.entity';
 
 @Entity()
 export class User {
@@ -23,6 +25,9 @@ export class User {
 
   @Column({ name: 'password_hash', type: 'text' })
   password: string;
+
+  @OneToMany(() => Posts, (post) => post.userId, { cascade: true })
+  post: Posts[];
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;

@@ -1,10 +1,6 @@
-import {
-  IsNotEmpty,
-  IsNumber,
-  IsString,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
+import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
+import { CreatePostSectionDto } from './create-post-section.dto';
+import { createTagDto } from 'src/tags/dtos/create-tag.dto';
 
 export class CreatePostDto {
   @MaxLength(200)
@@ -13,7 +9,19 @@ export class CreatePostDto {
   @IsNotEmpty()
   title: string;
 
-  @IsNumber()
+  @MaxLength(50)
+  @MinLength(10)
+  @IsString()
   @IsNotEmpty()
-  userId: number;
+  linkPosterFile: string;
+
+  @IsNotEmpty()
+  tags: createTagDto[];
+
+  @IsString()
+  @IsNotEmpty()
+  userId: string;
+
+  @IsNotEmpty()
+  sections: CreatePostSectionDto[];
 }

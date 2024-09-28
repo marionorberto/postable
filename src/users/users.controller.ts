@@ -5,6 +5,7 @@ import {
   Param,
   Post,
   Put,
+  Delete,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -17,15 +18,15 @@ import { AuthGuard } from 'src/auth/auth.guard';
 export class UsersController {
   constructor(private readonly usersServices: UsersService) {}
 
+  @Get(':id')
+  async findByPk(@Param('id') id: string) {
+    return await this.usersServices.findByPk(id);
+  }
+
   @Get()
   findAll() {
     return this.usersServices.findAll();
   }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.usersServices.findOne(id);
-  // }
 
   @Post()
   create(@Body() createUserDto: CreateUsersDto) {
@@ -37,13 +38,14 @@ export class UsersController {
   getProfile(@Request() req: any): any {
     return req['user'];
   }
+
   @Put(':id')
   updateOne(@Param('id') id: string, @Body() updateUsersDto: UpdateUsersDto) {
     return this.usersServices.updateOne(id, updateUsersDto);
   }
 
-  @Get(':id')
-  deleteOne(@Param('id') id: string) {
-    return this.usersServices.deleteOne(id);
+  @Delete(':id')
+  async deleteOne(@Param('id') id: string) {
+    return await this.usersServices.deleteOne(id);
   }
 }

@@ -1,7 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcryptjs from 'bcryptjs';
-import { User } from 'src/entities/user/user';
 import { UsersService } from 'src/users/users.service';
 import { SignInDto } from './dtos/sign-in.dto';
 
@@ -13,7 +12,7 @@ export class AuthService {
   ) {}
 
   async signIn(signInDto: SignInDto): Promise<{ acess_token: string }> {
-    const userData: User = await this.usersService.findOne({
+    const userData = await this.usersService.findOne({
       where: {
         email: signInDto.email,
       },
@@ -26,8 +25,6 @@ export class AuthService {
       signInDto.password,
       userData.password,
     );
-
-    console.log(isPasswordValid);
 
     if (!isPasswordValid)
       throw new HttpException('password not invalid', HttpStatus.UNAUTHORIZED);

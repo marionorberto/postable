@@ -1,19 +1,23 @@
 import {
   Column,
   CreateDateColumn,
+  Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { PostsSections } from '../posts-sections/posts-sections.entity';
 
+@Entity()
 export class PostsContents {
-  @PrimaryGeneratedColumn('uuid', { name: 'posts_sections_id' })
+  @PrimaryGeneratedColumn('uuid', { name: 'post_section_id' })
   postsContentsId: string;
-
-  @Column({ name: 'section_id', type: 'uuid' })
-  sectionId: string;
 
   @Column({ name: 'content', type: 'text' })
   content: string;
+
+  @ManyToOne(() => PostsSections, (postSection) => postSection.contents)
+  sections: PostsSections[];
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;
