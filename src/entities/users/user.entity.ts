@@ -7,12 +7,15 @@ import {
   BeforeInsert,
   BeforeUpdate,
   OneToMany,
+  OneToOne,
 } from 'typeorm';
-
 import * as bcryptjs from 'bcryptjs';
 import { Posts } from '../posts/posts.entity';
+import { Profile } from '../profiles/user-profile.entity';
+import { Exclude } from 'class-transformer';
+import { Notifications } from '../notifications/notifications.entity';
 
-@Entity()
+@Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid', { name: 'user_id' })
   id: string;
@@ -24,10 +27,26 @@ export class User {
   email: string;
 
   @Column({ name: 'password_hash', type: 'text' })
+  @Exclude()
   password: string;
 
-  @OneToMany(() => Posts, (post) => post.userId, { cascade: true })
+  @OneToMany(() => Posts, (post) => post.user, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   post: Posts[];
+
+  @OneToMany(() => Notifications, (notification) => notification.user, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  notifications: Notifications[];
+
+  @OneToOne(() => Profile, (profile) => profile.tags, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  profile: Profile[];
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;

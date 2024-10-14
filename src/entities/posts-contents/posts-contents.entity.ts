@@ -16,7 +16,10 @@ export class PostsContents {
   @Column({ name: 'content', type: 'text' })
   content: string;
 
-  @ManyToOne(() => PostsSections, (postSection) => postSection.contents)
+  @ManyToOne(() => PostsSections, (postSection) => postSection.contents, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   sections: PostsSections[];
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })

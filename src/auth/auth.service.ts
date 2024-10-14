@@ -12,29 +12,53 @@ export class AuthService {
   ) {}
 
   async signIn(signInDto: SignInDto): Promise<{ acess_token: string }> {
-    const userData = await this.usersService.findOne({
-      where: {
-        email: signInDto.email,
-      },
-    });
+    try {
+      const userData = await this.usersService.findOne({
+        where: {
+          email: signInDto.email,
+        },
+      });
 
-    if (!userData)
-      throw new HttpException('email not invalid', HttpStatus.UNAUTHORIZED);
+      const isPasswordValid = await this.validatePassword(
+        signInDto.password,
+        userData.password,
+      );
 
-    const isPasswordValid = await this.validatePassword(
-      signInDto.password,
-      userData.password,
-    );
+      if (!isPasswordValid)
+        throw new HttpException(
+          {
+            statusCode: 401,
+            method: 'POST',
+            message: 'USER PASSWORD Not Invalid.',
+            path: '/users',
+            timestamp: Date.now(),
+          },
+          HttpStatus.UNAUTHORIZED,
+        );
 
-    if (!isPasswordValid)
-      throw new HttpException('password not invalid', HttpStatus.UNAUTHORIZED);
+      const payloads = {
+        sub: userData.id,
+        username: userData.username,
+      };
 
-    const payloads = {
-      sub: userData.id,
-      username: userData.username,
-    };
+      return { acess_token: await this.jwtService.signAsync(payloads) };
+    } catch (error) {
+      console.log(
+        `Failed to authenticate User | Error Message: ${error.message}`,
+      );
 
-    return { acess_token: await this.jwtService.signAsync(payloads) };
+      throw new HttpException(
+        {
+          statusCode: 401,
+          method: 'POST',
+          message: 'Failed to authenticate User',
+          error: error.message,
+          path: '/users',
+          timestamp: Date.now(),
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   async validatePassword(

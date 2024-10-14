@@ -21,14 +21,18 @@ export class PostsSections {
   @Column({ name: 'section_order', nullable: true, type: 'int' })
   sectionOrder: number;
 
-  @ManyToOne(() => Posts, (post) => post.sections)
+  @ManyToOne(() => Posts, (post) => post.sections, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   post: Posts[];
 
   @Column({ name: 'link_file_section', type: 'text' })
   linkFileSection: string;
 
   @OneToMany(() => PostsContents, (postContent) => postContent.sections, {
-    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   contents: PostsContents[];
 

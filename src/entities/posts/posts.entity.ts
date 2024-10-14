@@ -10,18 +10,18 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { PostsSections } from '../posts-sections/posts-sections.entity';
-import { User } from '../user/user.entity';
+import { User } from '../users/user.entity';
 import { Tags } from '../tags/tags.entity';
 
-@Entity()
+@Entity('posts')
 export class Posts {
   @PrimaryGeneratedColumn('uuid', { name: 'post_id' })
   id: string;
 
-  @Column({ name: 'user_id', type: 'uuid' })
-  userId: string;
-
-  @ManyToOne(() => User, (user) => user.post)
+  @ManyToOne(() => User, (user) => user.post, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   user: User[];
 
   @Column({ name: 'title', type: 'varchar' })
@@ -35,7 +35,8 @@ export class Posts {
   tags: Tags[];
 
   @OneToMany(() => PostsSections, (postSection) => postSection.post, {
-    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   sections: PostsSections[];
 

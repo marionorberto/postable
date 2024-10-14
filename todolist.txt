@@ -1,8 +1,5 @@
 #POSTABLE
 
-
-
-
 Creating a professional-looking API involves following best practices in API design, development, and documentation. Here's a structured approach:
 
 ### 1. **Define API Purpose and Requirements**
@@ -237,3 +234,10 @@ To create an API for managing posts on a blog, you can structure it as follows:
    - Provide examples for different scenarios (e.g., successful creation, validation errors).
 
 This structure should provide a clean, professional, and user-friendly API for creating and managing blog posts.
+
+*   handle exception: database duplicate value(unique)
+
+#######
+   - **Query Parameters:**
+     - **`?page=1&limit=10`** for pagination.
+     - **`?author=John%20Doe`** to filter by author.
