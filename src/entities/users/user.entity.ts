@@ -7,15 +7,16 @@ import {
   BeforeInsert,
   BeforeUpdate,
   OneToMany,
-  OneToOne,
 } from 'typeorm';
 import * as bcryptjs from 'bcryptjs';
 import { Posts } from '../posts/posts.entity';
-import { Profile } from '../profiles/user-profile.entity';
 import { Exclude } from 'class-transformer';
 import { Notifications } from '../notifications/notifications.entity';
+import { PostComments } from '../posts-comments/posts-comments.entity';
+import { PostLikes } from '../posts-likes/posts-likes.entity';
+import { PostSaved } from '../posts-saved/posts-saved.entity';
 
-@Entity('users')
+@Entity('Users')
 export class User {
   @PrimaryGeneratedColumn('uuid', { name: 'user_id' })
   id: string;
@@ -31,22 +32,28 @@ export class User {
   password: string;
 
   @OneToMany(() => Posts, (post) => post.user, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
+    cascade: true,
   })
   post: Posts[];
 
+  @OneToMany(() => PostLikes, (like) => like.post, { cascade: true })
+  postLike: PostLikes[];
+
   @OneToMany(() => Notifications, (notification) => notification.user, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
+    cascade: true,
+    eager: true,
   })
   notifications: Notifications[];
 
-  @OneToOne(() => Profile, (profile) => profile.tags, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
+  @OneToMany(() => PostComments, (comment) => comment.user, {
+    cascade: true,
   })
-  profile: Profile[];
+  comments: PostComments[];
+
+  @OneToMany(() => PostSaved, (saved) => saved.user, {
+    cascade: true,
+  })
+  saves: PostSaved[];
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;

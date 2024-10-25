@@ -14,14 +14,18 @@ export class TagsService {
 
   async findAll() {
     try {
-      const allTags = await this.tagsRepository.find();
+      const allTags = await this.tagsRepository.find({
+        order: {
+          createdAt: 'DESC',
+        },
+      });
 
       return {
         statusCode: 200,
         method: 'GET',
-        message: 'tags fetched sucessfully.',
-        data: allTags,
-        path: '/users',
+        message: 'Tags fetched sucessfully.',
+        data: [{ count: allTags.length }, allTags],
+        path: '/tags/all',
         timestamp: Date.now(),
       };
     } catch (error) {
@@ -40,9 +44,38 @@ export class TagsService {
   }
 
   async create(createTagDto: CreateTagDto) {
-    const user = this.tagsRepository.create(createTagDto);
+    try {
+      const tagToSave = this.tagsRepository.create(createTagDto);
 
-    return await this.tagsRepository.save(user);
+      const { id, description, createdAt } =
+        await this.tagsRepository.save(tagToSave);
+      return {
+        statusCode: 201,
+        method: 'POST',
+        message: 'Tag created sucessfully',
+        data: {
+          id,
+          description,
+          createdAt,
+        },
+        path: '/tags/create',
+        timestamp: Date.now(),
+      };
+    } catch (error) {
+      console.log(`Failed to create new Tag | Error Message: ${error.message}`);
+
+      throw new HttpException(
+        {
+          statusCode: 400,
+          method: 'POST',
+          message: 'Failed to create new Tag',
+          error: error.message,
+          path: '/tags/create',
+          timestamp: Date.now(),
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   async findByPk(id: string) {
@@ -57,7 +90,7 @@ export class TagsService {
             statusCode: 404,
             method: 'GET',
             message: 'Failure to fetch this tag.',
-            path: '/tags',
+            path: '/tags/tag/:id',
             timestamp: Date.now(),
           },
           HttpStatus.NOT_FOUND,
@@ -68,7 +101,7 @@ export class TagsService {
         method: 'GET',
         message: 'Tag fetched sucessfully.',
         data: tag,
-        path: '/tag',
+        path: '/tags/tag/:id',
         timestamp: Date.now(),
       };
     } catch (error) {
@@ -82,7 +115,7 @@ export class TagsService {
           method: 'GET',
           message: 'Failed to fetch this tag.',
           error: error.message,
-          path: '/tag',
+          path: '/tags/tag/:id',
           timestamp: Date.now(),
         },
         HttpStatus.NOT_FOUND,
@@ -94,7 +127,7 @@ export class TagsService {
     try {
       await this.tagsRepository.update(id, updateTagDto);
 
-      const { description, createAt, updatedAt } =
+      const { description, createdAt, updatedAt } =
         await this.tagsRepository.findOneBy({ id });
 
       return {
@@ -104,10 +137,10 @@ export class TagsService {
         data: {
           id,
           description,
-          createdAt: createAt,
+          createdAt,
           updatedAt,
         },
-        path: '/tags',
+        path: '/tags/update/tag/:id',
         timestamp: Date.now(),
       };
     } catch (error) {
@@ -119,7 +152,7 @@ export class TagsService {
           method: 'PUT',
           message: 'Failed to update Tag',
           error: error.message,
-          path: '/tags',
+          path: '/tags/update/tag/:id',
           timestamp: Date.now(),
         },
         HttpStatus.BAD_REQUEST,
@@ -136,7 +169,7 @@ export class TagsService {
             statusCode: 404,
             method: 'GET',
             message: 'Tag Not Found',
-            path: '/tags',
+            path: '/tags/tag/:id',
             timestamp: Date.now(),
           },
           HttpStatus.NOT_FOUND,
@@ -148,7 +181,7 @@ export class TagsService {
         statusCode: 200,
         method: 'DELETE',
         message: 'Tag deleted sucessfully',
-        path: '/tags',
+        path: '/tags/delete/tag/:id',
         timestamp: Date.now(),
       };
     } catch (error) {
@@ -160,11 +193,19 @@ export class TagsService {
           method: 'DELETE',
           message: 'Failed to delete Tag',
           error: error.message,
-          path: '/tags',
+          path: '/tags/delete/tag/:id',
           timestamp: Date.now(),
         },
         HttpStatus.BAD_REQUEST,
       );
     }
+  }
+
+  async findOne(tag: string) {
+    return await this.tagsRepository.findOne({
+      where: {
+        description: tag,
+      },
+    });
   }
 }

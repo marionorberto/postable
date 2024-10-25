@@ -15,34 +15,34 @@ import { UpdateNotificationsDto } from './dtos/update-notifications.dto';
 export class NotificationsController {
   constructor(private notificationsServices: NotificationsService) {}
 
-  @Get('all')
-  async findAll() {
-    return await this.notificationsServices.findAll();
+  @Get('all/:userId')
+  async findAll(@Param('userId') userId: string) {
+    return await this.notificationsServices.findAll(userId);
   }
 
-  @Get('notifications/:id')
-  async findByPk(@Param('id') id: string) {
-    return await this.notificationsServices.findByPk(id);
+  @Get('notification/:idNotification')
+  async findByPk(@Param('idNotification') idNotification: string) {
+    return await this.notificationsServices.findByPk(idNotification);
   }
 
-  @Post('create/notifications')
+  @Post('create/notification')
   create(@Body() createNotificationsDto: CreateNotificationsDto) {
     return this.notificationsServices.create(createNotificationsDto);
   }
 
-  @Put('update/notifications/:id')
+  @Put('update/notification/:idNotification')
   async updateOne(
-    @Param('id') id: string,
-    @Body() updateNotificationsDto: UpdateNotificationsDto,
+    @Param('idNotification') idNotification: string,
+    @Body() updateNotificationsDto: Partial<UpdateNotificationsDto>,
   ) {
     return await this.notificationsServices.updateOne(
-      id,
+      idNotification,
       updateNotificationsDto,
     );
   }
 
-  @Delete('delete/notifications/:id')
-  async deleteOne(@Param('id') id: string) {
-    return await this.notificationsServices.deleteOne(id);
+  @Delete('delete/notification/:idNotification')
+  async deleteOne(@Param('idNotification') idNotification: string) {
+    return await this.notificationsServices.deleteOne(idNotification);
   }
 }

@@ -19,22 +19,22 @@ export class TagsController {
     return await this.tagsService.findAll();
   }
 
-  @Get('post/:id')
+  @Get('tag/:id')
   async findByPk(@Param('id') id: string) {
     return await this.tagsService.findByPk(id);
   }
 
-  @Post('create/:id')
+  @Post('create/tag')
   create(@Body() createTagDto: CreateTagDto) {
     return this.tagsService.create(createTagDto);
   }
 
-  @Put('update/post/:id')
+  @Put('update/tag/:id')
   async updateOne(@Param('id') id: string, @Body() updateTagDto: UpdateTagDto) {
     return this.tagsService.updateOne(id, updateTagDto);
   }
 
-  @Delete('delete/post/:id')
+  @Delete('delete/tag/:id')
   async deleteOne(@Param('id') id: string) {
     return await this.tagsService.deleteOne(id);
   }

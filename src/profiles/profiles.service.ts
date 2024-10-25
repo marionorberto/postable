@@ -4,23 +4,36 @@ import { Profile } from 'src/entities/profiles/user-profile.entity';
 import { Repository } from 'typeorm';
 import { CreateProfileDto } from './dtos/create-profile.dto';
 import { UpdateProfileDto } from './dtos/update-profile.dto';
+import { User } from 'src/entities/users/user.entity';
+import { TagsService } from 'src/tags/tags.service';
 
 @Injectable()
 export class ProfileService {
   constructor(
     @InjectRepository(Profile)
     private readonly profilesRepository: Repository<Profile>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    private readonly tagsService: TagsService,
   ) {}
 
   async findAll() {
     try {
-      const allTags = await this.profilesRepository.find();
+      const allProfiles = await this.profilesRepository.find({
+        relations: {
+          user: true,
+          tags: true,
+        },
+        order: {
+          createdAt: 'DESC',
+        },
+      });
 
       return {
         statusCode: 200,
         method: 'GET',
         message: 'profiles fetched sucessfully.',
-        data: allTags,
+        data: [{ count: allProfiles }, allProfiles],
         path: '/profiles',
         timestamp: Date.now(),
       };
@@ -31,7 +44,7 @@ export class ProfileService {
           statusCode: 400,
           method: 'GET',
           message: 'Failure to fetch profiles.',
-          path: '/profiles',
+          path: '/profiles/all',
           timestamp: Date.now(),
         },
         HttpStatus.BAD_REQUEST,
@@ -41,20 +54,64 @@ export class ProfileService {
 
   async create(createProfileDto: CreateProfileDto) {
     try {
+      const userData = await this.userRepository.findOneBy({
+        id: createProfileDto.userId,
+      });
+
+      if (!userData) {
+        throw new HttpException(
+          {
+            statusCode: 404,
+            method: 'GET',
+            message: 'User Not Found.',
+            path: '/users/create/user',
+            timestamp: Date.now(),
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      const existingTags = await Promise.all(
+        createProfileDto.tags.map(async (element) => {
+          return await this.tagsService.findOne(element.description);
+        }),
+      );
+
+      const hasFalsyValue = existingTags.some((element) => !element);
+
+      if (hasFalsyValue) {
+        throw new HttpException(
+          {
+            statusCode: 404,
+            method: 'GET',
+            message: 'Tags Not Found.',
+            path: '/tags/tag/:id',
+            timestamp: Date.now(),
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      console.log(userData);
+
       const profileToSave = this.profilesRepository.create(createProfileDto);
-      const profileSaved = await this.profilesRepository.save(profileToSave);
+
+      const profileSaved = await this.profilesRepository.save({
+        ...profileToSave,
+        tags: existingTags,
+        user: userData,
+      });
 
       const {
         id,
-        userId,
+        user,
         bio,
         birthday,
         countryName,
         job,
         remoteJob,
+        yearsWorking,
         urlImg,
         website,
-        yearsWorking,
         tags,
         createdAt,
       } = profileSaved;
@@ -65,7 +122,7 @@ export class ProfileService {
         message: 'Profile created sucessfully',
         data: {
           id,
-          userId,
+          user,
           bio,
           birthday,
           countryName,
@@ -77,7 +134,7 @@ export class ProfileService {
           tags,
           createdAt,
         },
-        path: '/profiles',
+        path: '/profiles/create/profile',
         timestamp: Date.now(),
       };
     } catch (error) {
@@ -91,7 +148,7 @@ export class ProfileService {
           method: 'POST',
           message: 'Failed to create new Profile',
           error: error.message,
-          path: '/profile',
+          path: '/profiles/create/profile',
           timestamp: Date.now(),
         },
         HttpStatus.BAD_REQUEST,
@@ -101,8 +158,14 @@ export class ProfileService {
 
   async findByPk(id: string) {
     try {
-      const profile = await this.profilesRepository.findOneBy({
-        id,
+      const profile = await this.profilesRepository.findOne({
+        where: {
+          id,
+        },
+        relations: {
+          tags: true,
+          user: true,
+        },
       });
 
       if (!profile)
@@ -144,12 +207,12 @@ export class ProfileService {
     }
   }
 
-  async updateOne(id: string, updateTagDto: UpdateProfileDto) {
+  async updateOne(id: string, updateTagDto: Partial<UpdateProfileDto>) {
     try {
       await this.profilesRepository.update(id, updateTagDto);
 
       const {
-        userId,
+        user,
         birthday,
         countryName,
         bio,
@@ -169,7 +232,7 @@ export class ProfileService {
         message: 'Profile updated sucessfully',
         data: {
           id,
-          userId,
+          user,
           birthday,
           countryName,
           bio,
@@ -182,7 +245,7 @@ export class ProfileService {
           createdAt,
           updatedAt,
         },
-        path: '/profiles',
+        path: '/profiles/profile/:id',
         timestamp: Date.now(),
       };
     } catch (error) {
@@ -196,7 +259,7 @@ export class ProfileService {
           method: 'PUT',
           message: 'Failed to update Profile',
           error: error.message,
-          path: '/profiles',
+          path: '/profiles/profile/:id',
           timestamp: Date.now(),
         },
         HttpStatus.BAD_REQUEST,
@@ -213,7 +276,7 @@ export class ProfileService {
             statusCode: 404,
             method: 'GET',
             message: 'Profile Not Found',
-            path: '/profiles',
+            path: '/profiles/profile/:id',
             timestamp: Date.now(),
           },
           HttpStatus.NOT_FOUND,
@@ -225,7 +288,7 @@ export class ProfileService {
         statusCode: 200,
         method: 'DELETE',
         message: 'Profile deleted sucessfully',
-        path: '/profiles',
+        path: '/profiles/delete/profile/:id',
         timestamp: Date.now(),
       };
     } catch (error) {
@@ -237,7 +300,7 @@ export class ProfileService {
           method: 'DELETE',
           message: 'Failed to delete Profile',
           error: error.message,
-          path: '/profiles',
+          path: '/profiles/delete/profile/:id',
           timestamp: Date.now(),
         },
         HttpStatus.BAD_REQUEST,

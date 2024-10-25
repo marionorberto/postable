@@ -4,16 +4,17 @@ import {
   JoinTable,
   ManyToMany,
   Column,
-  OneToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  JoinColumn,
+  OneToOne,
 } from 'typeorm';
 import { Tags } from '../tags/tags.entity';
 import { User } from '../users/user.entity';
 
-@Entity({ name: 'UserProfiles' })
+@Entity('User_Profiles')
 export class Profile {
-  @PrimaryGeneratedColumn('uuid', { name: 'user-profile-id' })
+  @PrimaryGeneratedColumn('uuid', { name: 'user_profile_id' })
   id: string;
 
   @Column({ name: 'country_name', type: 'varchar', length: '3' })
@@ -34,21 +35,19 @@ export class Profile {
   @Column({ name: 'remote_job', type: 'boolean' })
   remoteJob: boolean;
 
-  @Column({ name: 'url_website', type: 'varchar' })
+  @Column({ name: 'url_img', type: 'varchar' })
   urlImg: string;
 
   @Column({ name: 'url_website', type: 'varchar' })
   website: string;
 
-  @ManyToMany(() => Tags)
+  @ManyToMany(() => Tags, { cascade: true, eager: true })
   @JoinTable()
   tags: Tags[];
 
-  @OneToOne(() => User, (user) => user.profile, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  userId: User[];
+  @OneToOne(() => User, { cascade: true })
+  @JoinColumn()
+  user: User;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;

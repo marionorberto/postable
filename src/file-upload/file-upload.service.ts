@@ -1,8 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { FileUploadeToReturn } from './interfaces/file-uploaded-to-return';
 
 @Injectable()
 export class FileUploadService {
-  handleFileUpload(file: Express.Multer.File) {
+  handleFileUpload(file: Express.Multer.File): FileUploadeToReturn {
     try {
       if (!file) {
         throw new HttpException(

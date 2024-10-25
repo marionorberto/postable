@@ -5,7 +5,7 @@ import {
   Entity,
 } from 'typeorm';
 
-@Entity()
+@Entity('Tags')
 export class Tags {
   @PrimaryGeneratedColumn('uuid', { name: 'tag_id' })
   id: string;
@@ -14,7 +14,7 @@ export class Tags {
   description: string;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
-  createAt: Date;
+  createdAt: Date;
 
   @CreateDateColumn({ name: 'updated_at', type: 'timestamp' })
   updatedAt: Date;

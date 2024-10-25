@@ -1,44 +1,40 @@
 import {
   IsBoolean,
-  IsDate,
-  IsEmpty,
+  IsNotEmpty,
+  IsOptional,
   IsString,
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { User } from 'src/entities/users/user.entity';
 
 export class UpdateNotificationsDto {
   @MaxLength(300)
   @MinLength(30)
   @IsString()
-  @IsEmpty()
+  @IsNotEmpty()
   title: string;
 
   @MaxLength(300)
   @MinLength(30)
   @IsString()
-  @IsEmpty()
-  subtitle: string;
+  @IsNotEmpty()
+  @IsOptional()
+  subtitle?: string;
 
   @MaxLength(300)
   @MinLength(30)
   @IsString()
-  @IsEmpty()
+  @IsNotEmpty()
   content: string;
 
   @IsBoolean()
-  @IsEmpty()
-  read: boolean;
-
-  @IsDate()
-  @IsEmpty()
-  readAt: Date;
+  @IsNotEmpty()
+  @IsOptional()
+  read?: boolean;
 
   @MaxLength(60)
   @IsString()
-  @IsEmpty()
-  linkAction: string;
-
-  user: User[];
+  @IsNotEmpty()
+  @IsOptional()
+  linkAction?: string;
 }

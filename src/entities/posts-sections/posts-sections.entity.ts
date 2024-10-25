@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -10,8 +11,9 @@ import {
 import { Posts } from '../posts/posts.entity';
 import { PostsContents } from '../posts-contents/posts-contents.entity';
 
-@Entity()
+@Entity('Post_Sections')
 export class PostsSections {
+  constructor() {}
   @PrimaryGeneratedColumn('uuid', { name: 'post_section_id' })
   postsSectionsId: string;
 
@@ -21,18 +23,16 @@ export class PostsSections {
   @Column({ name: 'section_order', nullable: true, type: 'int' })
   sectionOrder: number;
 
-  @ManyToOne(() => Posts, (post) => post.sections, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  post: Posts[];
+  @ManyToOne(() => Posts, (post) => post.sections)
+  @JoinColumn()
+  post: Posts;
 
   @Column({ name: 'link_file_section', type: 'text' })
   linkFileSection: string;
 
   @OneToMany(() => PostsContents, (postContent) => postContent.sections, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
+    cascade: true,
+    eager: true,
   })
   contents: PostsContents[];
 

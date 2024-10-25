@@ -4,22 +4,28 @@ import {
   UpdateDateColumn,
   Entity,
   Column,
+  ManyToOne,
 } from 'typeorm';
+import { User } from '../users/user.entity';
+import { Posts } from '../posts/posts.entity';
 
-@Entity({ name: 'posts-comments' })
+@Entity('Post_Comments')
 export class PostComments {
-  @PrimaryGeneratedColumn('uuid', { name: 'post-comment-id' })
+  @PrimaryGeneratedColumn('uuid', { name: 'post_comment_id' })
   postCommentId: string;
 
-  @Column({ name: 'user-id', type: 'varchar' })
-  userId: string;
+  @Column({ name: 'comment', type: 'varchar', length: '300' })
+  comment: string;
 
-  @Column({ name: 'post-id', type: 'varchar' })
-  postId: string;
+  @ManyToOne(() => User, (user) => user.comments)
+  user: User;
 
-  @CreateDateColumn({ name: 'created-at', type: 'timestamp' })
+  @ManyToOne(() => Posts, (post) => post.comments)
+  post: Posts;
+
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated-at', type: 'timestamp' })
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
   updateAt: Date;
 }

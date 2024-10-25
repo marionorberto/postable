@@ -5,19 +5,27 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { CreateNotificationsDto } from './dtos/create-notifications.dto';
 import { UpdateNotificationsDto } from './dtos/update-notifications.dto';
+import { UsersService } from 'src/users/users.service';
+// import { User } from 'src/entities/users/user.entity';
 
 @Injectable()
 export class NotificationsService {
   constructor(
     @InjectRepository(Notifications)
     private readonly notificationsRepository: Repository<Notifications>,
+    private readonly userServices: UsersService,
   ) {}
 
-  async findAll() {
+  async findAll(userId: string) {
     try {
-      const allNotifications = await this.notificationsRepository.find({
+      // const { data }: { data: User } = await this.userServices.findByPk(userId);
+      console.log(userId);
+      const allUserNotifications = await this.notificationsRepository.find({
         relations: {
           user: true,
+        },
+        order: {
+          createdAt: 'DESC',
         },
       });
 
@@ -25,8 +33,8 @@ export class NotificationsService {
         statusCode: 200,
         method: 'GET',
         message: 'Notifications fetched sucessfully.',
-        data: allNotifications,
-        path: '/notifications',
+        data: [{ count: allUserNotifications.length }, allUserNotifications],
+        path: '/notifications/notification/:userId',
         timestamp: Date.now(),
       };
     } catch (error) {
@@ -38,7 +46,7 @@ export class NotificationsService {
           statusCode: 400,
           method: 'GET',
           message: 'Failure to fetch notifications.',
-          path: '/notifications',
+          path: '/notifications/notification/:id',
           timestamp: Date.now(),
         },
         HttpStatus.BAD_REQUEST,
@@ -46,14 +54,11 @@ export class NotificationsService {
     }
   }
 
-  async findByPk(id: string) {
+  async findByPk(idNotification: string) {
     try {
       const notification = await this.notificationsRepository.findOne({
         where: {
-          id,
-        },
-        relations: {
-          user: true,
+          id: idNotification,
         },
       });
 
@@ -73,8 +78,10 @@ export class NotificationsService {
         statusCode: 200,
         method: 'GET',
         message: 'Notification fetched sucessfully.',
-        data: notification,
-        path: '/notifications',
+        data: {
+          notification,
+        },
+        path: '/notifications/notification/:idNotification',
         timestamp: Date.now(),
       };
     } catch (error) {
@@ -97,10 +104,27 @@ export class NotificationsService {
   }
 
   async create(createNotificationsDto: Partial<CreateNotificationsDto>) {
+    console.log(createNotificationsDto);
     try {
       const notificationToSave = this.notificationsRepository.create(
         createNotificationsDto,
       );
+
+      const { data } = await this.userServices.findByPk(
+        createNotificationsDto.userId,
+      );
+
+      if (!data)
+        throw new HttpException(
+          {
+            statusCode: 400,
+            method: 'POST',
+            message: 'Failed to create new Notification',
+            path: '/notifications',
+            timestamp: Date.now(),
+          },
+          HttpStatus.NOT_FOUND,
+        );
 
       const {
         id,
@@ -112,7 +136,10 @@ export class NotificationsService {
         readAt,
         linkAction,
         createdAt,
-      } = await this.notificationsRepository.save(notificationToSave);
+      } = await this.notificationsRepository.save({
+        ...notificationToSave,
+        user: data,
+      });
       return {
         statusCode: 201,
         method: 'POST',
@@ -151,11 +178,14 @@ export class NotificationsService {
   }
 
   async updateOne(
-    id: string,
+    idNotification: string,
     updateNotificationsDto: Partial<UpdateNotificationsDto>,
   ) {
     try {
-      await this.notificationsRepository.update(id, updateNotificationsDto);
+      await this.notificationsRepository.update(
+        idNotification,
+        updateNotificationsDto,
+      );
 
       const {
         user,
@@ -167,14 +197,14 @@ export class NotificationsService {
         readAt,
         createdAt,
         updatedAt,
-      } = await this.notificationsRepository.findOneBy({ id });
+      } = await this.notificationsRepository.findOneBy({ id: idNotification });
 
       return {
         statusCode: 200,
         method: 'PUT',
         message: 'Notification updated sucessfully',
         data: {
-          id,
+          id: idNotification,
           user,
           title,
           subtitle,
@@ -185,7 +215,7 @@ export class NotificationsService {
           createdAt,
           updatedAt,
         },
-        path: '/notifications',
+        path: 'update/notification/:idNotification',
         timestamp: Date.now(),
       };
     } catch (error) {
@@ -199,7 +229,7 @@ export class NotificationsService {
           method: 'PUT',
           message: 'Failed to update Notification',
           error: error.message,
-          path: '/notification',
+          path: 'update/notification/:idNotification',
           timestamp: Date.now(),
         },
         HttpStatus.BAD_REQUEST,
@@ -207,25 +237,27 @@ export class NotificationsService {
     }
   }
 
-  async deleteOne(id: string) {
+  async deleteOne(idNotification: string) {
     try {
-      const postToDelete = await this.notificationsRepository.findOneBy({
-        id,
-      });
+      const notificationToDelete = await this.notificationsRepository.findOneBy(
+        {
+          id: idNotification,
+        },
+      );
 
-      if (!postToDelete)
+      if (!notificationToDelete)
         throw new HttpException(
           {
             statusCode: 404,
             method: 'GET',
             message: 'Notifications Not Found',
-            path: '/notifications',
+            path: '/notifications/:idNotification',
             timestamp: Date.now(),
           },
           HttpStatus.NOT_FOUND,
         );
 
-      await this.notificationsRepository.remove(postToDelete);
+      await this.notificationsRepository.remove(notificationToDelete);
 
       return {
         statusCode: 200,

@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { User } from '../users/user.entity';
 
-@Entity('notifications')
+@Entity('Notifications')
 export class Notifications {
   @PrimaryGeneratedColumn('uuid', { name: 'notification_id' })
   id: string;
@@ -25,17 +25,14 @@ export class Notifications {
   @Column({ name: 'read', type: 'boolean', default: false })
   read: boolean;
 
-  @Column({ name: 'read_at', type: 'datetime' })
+  @Column({ name: 'read_at', type: 'datetime', nullable: true })
   readAt: Date;
 
-  @Column({ name: 'link_action', type: 'varchar' })
+  @Column({ name: 'link_action', type: 'varchar', nullable: true })
   linkAction: string;
 
-  @ManyToOne(() => User, (users) => users.notifications, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  user: User[];
+  @ManyToOne(() => User, (users) => users.notifications)
+  user: User;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;

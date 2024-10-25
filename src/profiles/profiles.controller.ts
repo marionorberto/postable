@@ -24,7 +24,7 @@ export class ProfileController {
     return await this.profileService.findByPk(id);
   }
 
-  @Post('create/:id')
+  @Post('create/profile')
   create(@Body() createProfileDto: CreateProfileDto) {
     return this.profileService.create(createProfileDto);
   }
@@ -32,7 +32,7 @@ export class ProfileController {
   @Put('update/profile/:id')
   async updateOne(
     @Param('id') id: string,
-    @Body() updateProfileDto: UpdateProfileDto,
+    @Body() updateProfileDto: Partial<UpdateProfileDto>,
   ) {
     return this.profileService.updateOne(id, updateProfileDto);
   }

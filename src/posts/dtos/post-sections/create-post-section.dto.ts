@@ -5,7 +5,7 @@ import {
   MinLength,
   IsOptional,
 } from 'class-validator';
-import { CreatePostContentDto } from './create-post-content.dto';
+import { CreatePostContentDto } from '../post-contents/create-post-content.dto';
 
 export class CreatePostSectionDto {
   @MaxLength(200)
@@ -19,6 +19,8 @@ export class CreatePostSectionDto {
   @IsString()
   @IsOptional()
   linkFileSection: string;
+
+  sectionOrder?: number;
 
   contents: CreatePostContentDto[];
 }

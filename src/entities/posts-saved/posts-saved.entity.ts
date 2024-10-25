@@ -3,23 +3,29 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Entity,
+  ManyToOne,
   Column,
 } from 'typeorm';
+import { Posts } from '../posts/posts.entity';
+import { User } from '../users/user.entity';
 
-@Entity({ name: 'posts-saved' })
+@Entity('Post_Saved')
 export class PostSaved {
-  @PrimaryGeneratedColumn('uuid', { name: 'post-saved-id' })
-  postLikeId: string;
+  @PrimaryGeneratedColumn('uuid', { name: 'post_saved_id' })
+  postSaveId: string;
 
-  @Column({ name: 'user-id', type: 'varchar' })
-  userId: string;
+  @Column({ name: 'saved', type: 'boolean' })
+  saved: boolean;
 
-  @Column({ name: 'post-id', type: 'varchar' })
-  postId: string;
+  @ManyToOne(() => Posts, (post) => post.postLike)
+  post: Posts;
 
-  @CreateDateColumn({ name: 'created-at', type: 'timestamp' })
+  @ManyToOne(() => User, (user) => user.postLike)
+  user: User;
+
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated-at', type: 'timestamp' })
-  updateAt: Date;
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
+  updatedAt: Date;
 }

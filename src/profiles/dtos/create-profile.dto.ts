@@ -1,9 +1,10 @@
 import {
   IsBoolean,
-  IsDate,
+  IsDateString,
   IsNotEmpty,
   IsNumber,
   IsString,
+  IsUUID,
   MaxLength,
   MinLength,
 } from 'class-validator';
@@ -16,8 +17,8 @@ export class CreateProfileDto {
   @IsNotEmpty()
   countryName: string;
 
-  @IsDate()
-  birthday: Date;
+  @IsDateString()
+  birthday: string;
 
   @IsNumber()
   @IsNotEmpty()
@@ -26,7 +27,6 @@ export class CreateProfileDto {
   @MaxLength(300)
   @MinLength(3)
   @IsString()
-  @IsNotEmpty()
   bio: string;
 
   @MaxLength(100)
@@ -38,15 +38,20 @@ export class CreateProfileDto {
   @IsBoolean()
   remoteJob: boolean;
 
-  @MinLength(50)
+  @MaxLength(50)
   @IsString()
   @IsNotEmpty()
   urlImg: string;
 
-  @MinLength(50)
+  @MinLength(8)
   @IsString()
   @IsNotEmpty()
   website: string;
 
+  @IsUUID()
+  @IsNotEmpty()
+  userId: string;
+
+  @IsNotEmpty()
   tags: CreateTagDto[];
 }
