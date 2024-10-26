@@ -8,6 +8,7 @@ import {
   Put,
   UseInterceptors,
   ClassSerializerInterceptor,
+  // UseGuards,
 } from '@nestjs/common';
 import { CreatePostDto } from './dtos/create-post.dto';
 import { PostsService } from './posts.service';
@@ -26,8 +27,10 @@ import {
 } from './interfaces/return-interfaces';
 
 import { Throttle, SkipThrottle } from '@nestjs/throttler';
+// import { AuthGuard } from 'src/auth/auth.guard';
 
 // @SkipThrottle()
+// @UseGuards(AuthGuard)
 @Controller('posts')
 export class PostsController {
   constructor(private postsService: PostsService) {}

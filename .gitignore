@@ -3,7 +3,8 @@
 /node_modules
 /build
 
-./file.txt
+file.txt
+todolist.txt
 
 # Logs
 logs

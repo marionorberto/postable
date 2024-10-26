@@ -7,7 +7,7 @@ dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { logger: false });
-  app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix('api/v1/postable');
   // app.enableCors();
   app.useGlobalPipes(
     new ValidationPipe({

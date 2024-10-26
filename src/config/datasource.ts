@@ -16,9 +16,9 @@ import { Global, Module } from '@nestjs/common';
             type: 'mysql',
             host: 'localhost',
             port: 3306,
-            username: 'marionorberto',
-            password: 'cavera?@mau',
-            database: 'postable',
+            username: process.env.DATABASE_USERNAME,
+            password: process.env.DATABASE_PASSWORD,
+            database: process.env.DATABASE_NAME,
             synchronize: true,
             logging: false,
             entities: [`${__dirname}/../entities/**/**.entity{.ts,.js}`], // this will automatically load all entity file in the src folder

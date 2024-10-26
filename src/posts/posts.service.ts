@@ -40,11 +40,9 @@ export class PostsService {
 
   async findAll(): Promise<FindAllReturn> {
     try {
-      const allPosts = await this.postRespository.find({
+      const allPosts = await this.userRespository.find({
         relations: {
-          sections: true,
-          tags: true,
-          user: true,
+          post: true,
         },
         order: {
           createdAt: 'DESC',
