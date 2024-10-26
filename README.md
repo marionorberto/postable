@@ -46,13 +46,12 @@ NestJS, applying modular architecture and SOLID principles to create scalable an
 
 ### Built With
 
-* [![React][React.js]][React-url]
-* [![Vue][Vue.js]][Vue-url]
-* [![Angular][Angular.io]][Angular-url]
-* [![Svelte][Svelte.dev]][Svelte-url]
-* [![Laravel][Laravel.com]][Laravel-url]
-* [![Bootstrap][Bootstrap.com]][Bootstrap-url]
-* [![JQuery][JQuery.com]][JQuery-url]
+* TYPESCRIPT
+* NESTJS
+* TYPEORM
+* MYSQL
+* JWT
+* DOCKER
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -63,12 +62,8 @@ NestJS, applying modular architecture and SOLID principles to create scalable an
 
 ### Prerequisites
 
-Ensure your have installed on your machine: Vscode, nodeJS, npm(or preferencial).
-<!-- 
-* npm
-  ```sh
-  npm install npm@latest -g
-  ``` -->
+Ensure your have installed on your machine: Vscode, node, npm(or preferencial), nestjs-cli, mysql.
+
 
 ### Installation
 

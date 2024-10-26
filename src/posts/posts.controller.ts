@@ -27,7 +27,7 @@ import {
 
 import { Throttle, SkipThrottle } from '@nestjs/throttler';
 
-@SkipThrottle()
+// @SkipThrottle()
 @Controller('posts')
 export class PostsController {
   constructor(private postsService: PostsService) {}
